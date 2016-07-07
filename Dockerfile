@@ -8,7 +8,7 @@
 
 FROM debian:jessie
 
-ENV NODE_VERSION v6.1.0
+ENV NODE_VERSION v6.3.0
 ENV DOCKER_BASE_VERSION=0.0.4
 
 CMD [ "/bin/dumb-init", "-v", "/bin/sh", "/docker-entrypoint.sh" ]
@@ -41,7 +41,8 @@ RUN git clone https://github.com/creationix/nvm.git /opt/nvm \
     && nvm use $NODE_VERSION \
     && nvm alias default $NODE_VERSION \
     && ln -s /opt/nvm/versions/node/$NODE_VERSION/bin/node /usr/bin/node \
-    && ln -s /opt/nvm/versions/node/$NODE_VERSION/bin/npm /usr/bin/npm
+    && ln -s /opt/nvm/versions/node/$NODE_VERSION/bin/npm /usr/bin/npm \
+    && npm install pm2 -g
 
 # Bugfix. Maybe is not need. Should test. See https://github.com/npm/npm/issues/9863
 RUN cd $(npm root -g)/npm \
