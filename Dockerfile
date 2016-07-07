@@ -7,9 +7,11 @@
 # @copyright   Alligo Tecnologia Ltda 2016. All rights reserved
 
 FROM debian:jessie
+MAINTAINER Alligo Tecnologia Ltda "alligo@alligo.com.br"
 
 ENV NODE_VERSION v6.3.0
 ENV DOCKER_BASE_VERSION=0.0.4
+ENV NGINX_VERSION 1.11.1-1~jessie
 
 CMD [ "/bin/dumb-init", "-v", "/bin/sh", "/docker-entrypoint.sh" ]
 
@@ -35,6 +37,7 @@ RUN gpg --keyserver pgp.mit.edu --recv-keys 91A6E7F85D05C65630BEF18951852D87348F
     && unzip docker-base_${DOCKER_BASE_VERSION}_linux_amd64.zip \
     && cp -R bin/gosu bin/dumb-init /bin
 
+# NVM, NodeJs, PM2
 RUN git clone https://github.com/creationix/nvm.git /opt/nvm \
     && source /opt/nvm/nvm.sh \
     && nvm install $NODE_VERSION \
@@ -60,3 +63,24 @@ RUN npm install
 
 COPY run/ /opt/run
 COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+### @todo move up any after this line. For now are just for speed up building
+
+# NGinx
+RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 \
+	&& echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list \
+	&& apt-get update \
+	&& apt-get install --no-install-recommends --no-install-suggests -y \
+						ca-certificates \
+						nginx=${NGINX_VERSION} \
+						nginx-module-xslt \
+						nginx-module-geoip \
+						nginx-module-image-filter \
+						nginx-module-perl \
+						nginx-module-njs \
+						gettext-base \
+	&& rm -rf /var/lib/apt/lists/*
+
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+	&& ln -sf /dev/stderr /var/log/nginx/error.log
