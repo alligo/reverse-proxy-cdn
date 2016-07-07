@@ -10,8 +10,13 @@ FROM debian:jessie
 MAINTAINER Alligo Tecnologia Ltda "alligo@alligo.com.br"
 
 ENV NODE_VERSION v6.3.0
-ENV DOCKER_BASE_VERSION=0.0.4
-ENV NGINX_VERSION 1.11.1-1~jessie
+ENV DOCKER_BASE_VERSION 0.0.4
+#ENV NGINX_VERSION 1.11.1-1~jessie  #bug?
+ENV NGINX_VERSION 1.10.1-1~jessie
+
+ENV VARNISH_BACKEND_PORT 8888
+ENV VARNISH_BACKEND_IP 127.0.0.1
+ENV VARNISH_PORT 8080
 
 CMD [ "/bin/dumb-init", "-v", "/bin/sh", "/docker-entrypoint.sh" ]
 
@@ -21,7 +26,7 @@ RUN rm /bin/sh \
     && dpkg-reconfigure --frontend noninteractive tzdata \
     && apt-get update \
     && apt-get upgrade -y \
-    && apt-get install -y g++ gcc make python git curl ca-certificates sed haproxy gnupg openssl wget unzip --no-install-recommends \
+    && apt-get install -y g++ gcc make python git curl ca-certificates sed gnupg openssl wget unzip varnish --no-install-recommends \
     && rm -rf /tmp/* \
     && mkdir /opt/nvm \
     && apt-get clean
@@ -68,7 +73,7 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # NGinx
 RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 \
-	&& echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list \
+	&& echo "deb http://nginx.org/packages/debian/ jessie nginx" >> /etc/apt/sources.list \
 	&& apt-get update \
 	&& apt-get install --no-install-recommends --no-install-suggests -y \
 						ca-certificates \

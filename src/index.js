@@ -2,12 +2,10 @@
 var http = require('http');
 
 
-var PORT=8080; 
-var domainexample = 'http://cdn.fititnt.org';
+var PORT=8888; 
 
 var http = require('http'),
-    request = require('request'),
-    remote = domainexample;
+    request = require('request');
 
 http.createServer(function (req, res) {
   // http://somewhere.com/noo.bin
