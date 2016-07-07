@@ -1,4 +1,4 @@
 #!/bin/bash
 
-sudo service start nginx
+service nginx start
 # @todo ...
