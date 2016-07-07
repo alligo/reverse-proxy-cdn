@@ -40,9 +40,10 @@ RUN git clone https://github.com/creationix/nvm.git /opt/nvm \
     && nvm install $NODE_VERSION \
     && nvm use $NODE_VERSION \
     && nvm alias default $NODE_VERSION \
+    && npm install -g pm2 \
     && ln -s /opt/nvm/versions/node/$NODE_VERSION/bin/node /usr/bin/node \
     && ln -s /opt/nvm/versions/node/$NODE_VERSION/bin/npm /usr/bin/npm \
-    && npm install pm2 -g
+    && ln -s /opt/nvm/versions/node/$NODE_VERSION/bin/pm2 /usr/bin/pm2
 
 # Bugfix. Maybe is not need. Should test. See https://github.com/npm/npm/issues/9863
 RUN cd $(npm root -g)/npm \

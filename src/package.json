@@ -1,11 +1,14 @@
 {
   "name": "reverse-proxy-cdn",
   "version": "1.0.0",
-  "description": "",
+  "description": "reverse-proxy-cdn",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "alligo@alligo.com.br",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.72.0"
+  }
 }
