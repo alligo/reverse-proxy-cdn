@@ -11,15 +11,9 @@ var http = require('http')
         , Conf = require('./configuration.json')
         , PORT = 8888;
 
-(function () {
-  //Conf.allowedDomains = Conf.allowedDomains[0] = "*" ? true : Conf.allowedDomains;
-  //Conf.deniedDomains = Conf.deniedDomains[0] = "*" ? true : Conf.deniedDomains;
-  console.log(Conf);
-})();
-
-
 /**
- * 
+ * Callback to execute for each request
+ *
  * @param   {Event/Request}  req
  * @param   {Event/Response} res
  * @returns void
@@ -41,59 +35,56 @@ function forEachRequest(req, res) {
  */
 function getValidURL(url) {
   var result = url && url.substr ? url.substr(1) : false;
-  console.log('getValidURL ' + result);
-
-  console.log("isAllowedURL(result)", isAllowedURL(result));
 
   return isAllowedURL(result) ? result : false;
 }
 
 /**
- * 
- * @param {type} url
+ * Check if URL is allowed to crawler
+ *
+ * @param   {String} url
  * @returns {Boolean}
  */
 function isAllowedURL(url) {
-  var plainUrl = "";
+  var plainUrl = "", i;
   if (url.indexOf('http') !== 0) {
-    console.log('isAllowedURL DENY: (no http) url[' + url + ']');
+    Conf.debug && console.log('DEBUG: isAllowedURL DENY: (no http) url[' + url + ']');
     return false;
   }
-
-  return true;
-  // @todo resolve bugs after this line (fititnt, 2016-07-10 02:31)
 
   plainUrl = url.replace('https://', '').replace('http://', '');
 
+  if (Conf.deniedStrings) {
+    for (i = 0; i < Conf.deniedStrings.length; i++) {
+      if (plainUrl.indexOf(Conf.deniedStrings[i]) !== -1) {
+        Conf.debug && console.log('DEBUG: isAllowedURL DENY (deniedStrings): url[' + url + '], rule [' + Conf.deniedStrings[i] + ']');
+        return false;
+      }
+    }
+  }
+
   if (Conf.allowedDomains[0] !== "*") {
-    for (var i; i < Conf.allowedDomains.length; i++) {
-      if (Conf.allowedDomains[i].indexOf(plainUrl) === 0) {
-        console.log('isAllowedURL OK: url[' + url + '], rule [' + Conf.allowedDomains[i] + ']');
+    //console.log("DEBUG isAllowedURL,  allowedDomains !== *", Conf.allowedDomains.length);
+    for (i = 0; i < Conf.allowedDomains.length; i++) {
+      //Conf.debug && console.log('loop', Conf.allowedDomains[i].indexOf(plainUrl), Conf.allowedDomains[i], plainUrl);
+      if (plainUrl.indexOf(Conf.allowedDomains[i]) === 0) {
+        Conf.debug && console.log('DEBUG: isAllowedURL OK: url[' + url + '], rule [' + Conf.allowedDomains[i] + ']');
         return true;
       }
     }
-//    Conf.allowedDomains.forEach(function (val, idx) {
-//      if (val.indexOf(plainUrl) === 0) {
-//        console.log('isAllowedURL OK: url[' + url + '], rule [' + val + ']');
-//        return true;
-//      }
-//    });
   }
+
   if (Conf.deniedDomains[0] === "*") {
+    //console.log("DEBUG: isAllowedURL, deniedDomains === *")
     return false;
   }
-  for (var i; i < Conf.deniedDomains.length; i++) {
-    if (Conf.deniedDomains[i].indexOf(plainUrl) === 0) {
-      console.log('isAllowedURL DENY: url[' + url + '], rule [' + Conf.deniedDomains[i] + ']');
-      return true;
+
+  for (i = 0; i < Conf.deniedDomains.length; i++) {
+    if (plainUrl.indexOf(Conf.deniedDomains[i]) === 0) {
+      //console.log('DEBUG: isAllowedURL DENY: url[' + url + '], rule [' + Conf.deniedDomains[i] + ']');
+      return false;
     }
   }
-//  Conf.allowedDomains.forEach(function (val, idx) {
-//    if (val.indexOf(plainUrl) === 0) {
-//      console.log('isAllowedURL DENY: url[' + url + '], rule [' + val + ']');
-//      return true;
-//    }
-//  });
 
   return true;
 }
@@ -106,10 +97,11 @@ function isAllowedURL(url) {
  * @returns {void}
  */
 function returnInvalidObject(remoteUrl, res) {
-  console.log("INFO: invalid request " + remoteUrl);
-  res.statusCode = 404;
+  Conf.debug && console.log("DEBUG: invalid request " + remoteUrl);
+  res.writeHead(401, {"Content-Type": "application/json"});
+  res.write('{"code": 401, "msg": "Unauthorized"}');
+  res.end();
 }
-
 
 /**
  * Handle a valid request
@@ -119,7 +111,7 @@ function returnInvalidObject(remoteUrl, res) {
  * @returns {void}
  */
 function returnObject(remoteUrl, res) {
-  console.log("DEBUG: requested " + remoteUrl);
+  Conf.debug && console.log("DEBUG: requested " + remoteUrl);
   Request(remoteUrl).pipe(res);
 }
 

@@ -1,6 +1,7 @@
 {
+  "debug": true,
   "allowedDomains": [
-    "fititnt.org",
+    "cdn.fititnt.org",
     "alligo.com.br"
   ],
   "allowedMimeTypes": [
@@ -11,5 +12,9 @@
   ],
   "deniedMimeTypes": [
     "@todo implement"
+  ],
+  "deniedStrings": [
+    "viagra",
+    ".html"
   ]
 }
