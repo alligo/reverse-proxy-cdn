@@ -6,8 +6,16 @@
  * @author        Emerson Rocha Luiz <emerson at alligo.com.br>
  */
 
-var http = require('http'), Request = require('request');
-var PORT = 8888;
+var http = require('http')
+        , Request = require('request')
+        , Conf = require('./configuration.json')
+        , PORT = 8888;
+
+(function () {
+  //Conf.allowedDomains = Conf.allowedDomains[0] = "*" ? true : Conf.allowedDomains;
+  //Conf.deniedDomains = Conf.deniedDomains[0] = "*" ? true : Conf.deniedDomains;
+  console.log(Conf);
+})();
 
 
 /**
@@ -34,12 +42,62 @@ function forEachRequest(req, res) {
 function getValidURL(url) {
   var result = url && url.substr ? url.substr(1) : false;
   console.log('getValidURL ' + result);
-  if (result.indexOf('http') !== 0) {
-    result = false;
+
+  console.log("isAllowedURL(result)", isAllowedURL(result));
+
+  return isAllowedURL(result) ? result : false;
+}
+
+/**
+ * 
+ * @param {type} url
+ * @returns {Boolean}
+ */
+function isAllowedURL(url) {
+  var plainUrl = "";
+  if (url.indexOf('http') !== 0) {
+    console.log('isAllowedURL DENY: (no http) url[' + url + ']');
+    return false;
   }
 
-  return result;
+  return true;
+  // @todo resolve bugs after this line (fititnt, 2016-07-10 02:31)
+
+  plainUrl = url.replace('https://', '').replace('http://', '');
+
+  if (Conf.allowedDomains[0] !== "*") {
+    for (var i; i < Conf.allowedDomains.length; i++) {
+      if (Conf.allowedDomains[i].indexOf(plainUrl) === 0) {
+        console.log('isAllowedURL OK: url[' + url + '], rule [' + Conf.allowedDomains[i] + ']');
+        return true;
+      }
+    }
+//    Conf.allowedDomains.forEach(function (val, idx) {
+//      if (val.indexOf(plainUrl) === 0) {
+//        console.log('isAllowedURL OK: url[' + url + '], rule [' + val + ']');
+//        return true;
+//      }
+//    });
+  }
+  if (Conf.deniedDomains[0] === "*") {
+    return false;
+  }
+  for (var i; i < Conf.deniedDomains.length; i++) {
+    if (Conf.deniedDomains[i].indexOf(plainUrl) === 0) {
+      console.log('isAllowedURL DENY: url[' + url + '], rule [' + Conf.deniedDomains[i] + ']');
+      return true;
+    }
+  }
+//  Conf.allowedDomains.forEach(function (val, idx) {
+//    if (val.indexOf(plainUrl) === 0) {
+//      console.log('isAllowedURL DENY: url[' + url + '], rule [' + val + ']');
+//      return true;
+//    }
+//  });
+
+  return true;
 }
+
 /**
  * Handle a invalid request
  *
@@ -51,6 +109,7 @@ function returnInvalidObject(remoteUrl, res) {
   console.log("INFO: invalid request " + remoteUrl);
   res.statusCode = 404;
 }
+
 
 /**
  * Handle a valid request

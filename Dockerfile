@@ -79,13 +79,16 @@ RUN cd $(npm root -g)/npm \
 
 WORKDIR /opt/src
 ADD configuration/ /opt/src/configuration/
+COPY crawler/index.js /opt/src/index.js
+COPY crawler/package.json /opt/src/package.json
 COPY prepare-configurations.sh /opt/src/prepare-configurations.sh
 RUN /opt/src/prepare-configurations.sh
-COPY crawler/package.json /opt/src/package.json
+
 #RUN npm install -g node-gyp nan
 
 #COPY crawler/ /opt/src/
 #RUN mv config/config-example.json config/config.json
+
 RUN npm install
 
 COPY run/ /opt/run
