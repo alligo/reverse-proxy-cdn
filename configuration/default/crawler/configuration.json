@@ -1,5 +1,8 @@
 {
+  "Cache-Control": "public, max-age=2592001",
   "debug": true,
+  "proxyList": [
+  ],
   "allowedDomains": [
     "cdn.fititnt.org",
     "alligo.com.br"

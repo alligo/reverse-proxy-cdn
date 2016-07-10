@@ -44,9 +44,8 @@ Connection: keep-alive
 
 ## @todo
 
-- Use default configurations for nodeapp, but replace if user place a custom
-- Use default configurations for varnish, but replace if user place a custom
-- Use default configurations for nginx, but replace if user place a custom
+- Implement SSL
+- Implement Crawler via proxies
 
 ## Troubleshot
 

@@ -112,7 +112,19 @@ function returnInvalidObject(remoteUrl, res) {
  */
 function returnObject(remoteUrl, res) {
   Conf.debug && console.log("DEBUG: requested " + remoteUrl);
-  Request(remoteUrl).pipe(res);
+
+  // Proxies are not tested... yet
+  if (Conf.proxyList && Conf.proxyList.length) {
+    Request = Request.defaults({'proxy': Conf.proxyList[[Math.floor(Math.random() * Conf.proxyList.length)]]});
+  }
+
+  Request(remoteUrl).on('response', function (res) {
+    res.headers['x-cdn'] = 'alligo';
+    delete res.headers['expires'];
+    delete res.headers['pragma'];
+    res.headers["Cache-Control"] = Conf["Cache-Control"];
+    // ...
+  }).pipe(res);
 }
 
 http.createServer(forEachRequest).listen(PORT, function () {
