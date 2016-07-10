@@ -3,7 +3,7 @@
 #
 # @description Simple script to replace system file configurations
 #              with defaults. Fist check for configuration/app
-#              files and, if does not have, will use configuration/default/app
+#              files and, if does not have, will use configuration/_default/app
 #
 # @author      Bernardo Donadio <bcdonadio@alligo.com.br>
 # @author      Emerson Rocha Luiz <emerson@alligo.com.br>
@@ -43,19 +43,19 @@ BASE=`pwd`
 replace_file_with_default \
   "$BASE"/configuration.json \
   "$BASE"/configuration/crawler/configuration.json \
-  "$BASE"/configuration/default/crawler/configuration.json
+  "$BASE"/configuration/_default/crawler/configuration.json
 
 replace_file_with_default \
   /etc/nginx/nginx.conf \
   "$BASE"/configuration/nginx/nginx.conf \
-  "$BASE"/configuration/default/nginx/nginx.conf
+  "$BASE"/configuration/_default/nginx/nginx.conf
 
 replace_file_with_default \
   /etc/nginx/conf.d/default.conf \
   "$BASE"/configuration/nginx/conf.d/default.conf \
-  "$BASE"/configuration/default/nginx/conf.d/default.conf
+  "$BASE"/configuration/_default/nginx/conf.d/default.conf
 
 replace_file_with_default \
   /etc/varnish/default.vcl \
   "$BASE"/configuration/varnish/default.vcl \
-  "$BASE"/configuration/default/varnish/default.vcl
+  "$BASE"/configuration/_default/varnish/default.vcl
