@@ -21,21 +21,21 @@
 #######################################
 replace_file_with_default() {
   if [ -e "$2" ]; then
-    echo "Replace $1 with $2"
+    echo "Replace $1 with CUSTOM $2"
     if [ -e "$1" ]; then
       rm -f $1;
     fi
     mv $2 $1
   elif [ -e "$3" ]; then
-    echo "Replace $1 with default $3"
+    echo "Replace $1 with DEFAULT $3"
     if [ -e "$1" ]; then
       rm -f $1;
     fi
     mv $3 $1
   else
-    echo "DEBUG error?"
+    echo "DEBUG error? 1:[$1]  2:[$2] 3:[$3]"
   fi
-  echo "DEBUG replace_file_with_default 1:[$1]  2:[$2] 3:[$3]"
+  #echo "DEBUG replace_file_with_default 1:[$1]  2:[$2] 3:[$3]"
 }
 
 BASE=`pwd`
@@ -43,7 +43,7 @@ BASE=`pwd`
 replace_file_with_default \
   "$BASE"/configuration.json \
   "$BASE"/configuration/crawler/configuration.json \
-  "$BASE"/configuration/crawler/default/configuration.json
+  "$BASE"/configuration/default/crawler/configuration.json
 
 replace_file_with_default \
   /etc/nginx/nginx.conf \

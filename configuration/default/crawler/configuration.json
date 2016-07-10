@@ -1,0 +1,15 @@
+{
+  "allowedDomains": [
+    "fititnt.org",
+    "alligo.com.br"
+  ],
+  "allowedMimeTypes": [
+    "@todo implement"
+  ],
+  "deniedDomains": [
+    "*"
+  ],
+  "deniedMimeTypes": [
+    "@todo implement"
+  ]
+}
