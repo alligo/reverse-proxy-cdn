@@ -59,10 +59,10 @@ RUN cd $(npm root -g)/npm \
     && sed -i -e s/graceful-fs/fs-extra/ -e s/fs.rename/fs.move/ ./lib/utils/rename.js
 
 WORKDIR /opt/src
-COPY src/package.json /opt/src/package.json
+COPY crawler/package.json /opt/src/package.json
 RUN npm install -g node-gyp nan
 
-COPY src/ /opt/src/
+COPY crawler/ /opt/src/
 #RUN mv config/config-example.json config/config.json
 RUN npm install
 

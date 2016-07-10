@@ -17,10 +17,6 @@ var PORT = 8888;
  * @returns void
  */
 function forEachRequest(req, res) {
-  // http://somewhere.com/noo.bin
-  //var remoteUrl = domainexample + req.url;
-  //var remoteUrl = req.url.substr(1); // remove primeira /
-  //Request(remoteUrl).pipe(res);
   var remoteUrl = getValidURL(req.url); // remove primeira /
   if (remoteUrl) {
     returnObject(remoteUrl, res);
@@ -53,6 +49,7 @@ function getValidURL(url) {
  */
 function returnInvalidObject(remoteUrl, res) {
   console.log("INFO: invalid request " + remoteUrl);
+  res.statusCode = 404;
 }
 
 /**
@@ -67,4 +64,6 @@ function returnObject(remoteUrl, res) {
   Request(remoteUrl).pipe(res);
 }
 
-http.createServer(forEachRequest).listen(PORT);
+http.createServer(forEachRequest).listen(PORT, function () {
+  console.log("reverse-proxy-cdn crawler is listening on port: http://localhost:%s", PORT);
+});
