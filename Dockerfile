@@ -31,6 +31,25 @@ RUN rm /bin/sh \
     && mkdir /opt/nvm \
     && apt-get clean
 
+# NGinx
+RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 \
+	&& echo "deb http://nginx.org/packages/debian/ jessie nginx" >> /etc/apt/sources.list \
+	&& apt-get update \
+	&& apt-get install --no-install-recommends --no-install-suggests -y \
+						ca-certificates \
+						nginx=${NGINX_VERSION} \
+						nginx-module-xslt \
+						nginx-module-geoip \
+						nginx-module-image-filter \
+						nginx-module-perl \
+						nginx-module-njs \
+						gettext-base \
+	&& rm -rf /var/lib/apt/lists/*
+
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+	&& ln -sf /dev/stderr /var/log/nginx/error.log
+
 # Dump-init
 WORKDIR /tmp
 RUN gpg --keyserver pgp.mit.edu --recv-keys 91A6E7F85D05C65630BEF18951852D87348FFC4C \
@@ -59,10 +78,13 @@ RUN cd $(npm root -g)/npm \
     && sed -i -e s/graceful-fs/fs-extra/ -e s/fs.rename/fs.move/ ./lib/utils/rename.js
 
 WORKDIR /opt/src
+ADD configuration/ /opt/src/configuration/
+COPY prepare-configurations.sh /opt/src/prepare-configurations.sh
+RUN /opt/src/prepare-configurations.sh
 COPY crawler/package.json /opt/src/package.json
-RUN npm install -g node-gyp nan
+#RUN npm install -g node-gyp nan
 
-COPY crawler/ /opt/src/
+#COPY crawler/ /opt/src/
 #RUN mv config/config-example.json config/config.json
 RUN npm install
 
@@ -70,22 +92,3 @@ COPY run/ /opt/run
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 ### @todo move up any after this line. For now are just for speed up building
-
-# NGinx
-RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 \
-	&& echo "deb http://nginx.org/packages/debian/ jessie nginx" >> /etc/apt/sources.list \
-	&& apt-get update \
-	&& apt-get install --no-install-recommends --no-install-suggests -y \
-						ca-certificates \
-						nginx=${NGINX_VERSION} \
-						nginx-module-xslt \
-						nginx-module-geoip \
-						nginx-module-image-filter \
-						nginx-module-perl \
-						nginx-module-njs \
-						gettext-base \
-	&& rm -rf /var/lib/apt/lists/*
-
-# forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log \
-	&& ln -sf /dev/stderr /var/log/nginx/error.log
