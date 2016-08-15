@@ -1,4 +1,4 @@
 #!/bin/bash
 
-service varnish start
+#service varnish start
 # @todo ...
