@@ -19,5 +19,14 @@
   "deniedStrings": [
     "viagra",
     ".html"
-  ]
+  ],
+  "onErrors": {
+    "statusCodes": [403, 500],
+    "response": {
+      "statusCode": 200,
+      "Cache-Control": "public, max-age=3600",
+      "Content-Type": "text/plain",
+      "body": "Fetch Error"
+    }
+  }
 }

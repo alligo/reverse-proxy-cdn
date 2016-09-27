@@ -40,6 +40,31 @@ function getValidURL(url) {
 }
 
 /**
+ * Graceful exit
+ *
+ * @param   {Event/Response} res
+ * @returns {Event/Response}
+ */
+function gracefulErrorHandling(res, res2) {
+  if (Conf.onErrors && Conf.onErrors.statusCodes.indexOf(res.statusCode) !== -1) {
+    console.log(res);
+    res.statusCode = Conf.onErrors.response.statusCode;
+    res.headers["Cache-Control"] = Conf.onErrors.response["Cache-Control"];
+    res.headers["Content-Type"] = Conf.onErrors.response["Content-Type"];
+    //res.write(Conf.onErrors.response.body);
+    //res.writeHead(200, {'Content-Type': 'text/plain'});
+    //res.end();
+    res2.writeHead( Conf.onErrors.response.statusCode, {"Content-Type": Conf.onErrors.response["Content-Type"]});
+    res2.write(Conf.onErrors.response.body);
+//    console.log(res2)
+//    res2.end();
+//    res2 = {"write": function(){}};
+  }
+
+  return res2;
+}
+
+/**
  * Check if URL is allowed to crawler
  *
  * @param   {String} url
@@ -107,10 +132,10 @@ function returnInvalidObject(remoteUrl, res) {
  * Handle a valid request
  *
  * @param   {Strong}         remoteUrl  remote url
- * @param   {Event/Response} res
+ * @param   {Event/Response} res2
  * @returns {void}
  */
-function returnObject(remoteUrl, res) {
+function returnObject(remoteUrl, res2) {
   Conf.debug && console.log("DEBUG: requested " + remoteUrl);
 
   // Proxies are not tested... yet
@@ -123,8 +148,9 @@ function returnObject(remoteUrl, res) {
     delete res.headers['expires'];
     delete res.headers['pragma'];
     res.headers["Cache-Control"] = Conf["Cache-Control"];
+    res2 = gracefulErrorHandling(res, res2);
     // ...
-  }).pipe(res);
+  }).pipe(res2);
 }
 
 http.createServer(forEachRequest).listen(PORT, function () {
